@@ -2,11 +2,21 @@ const ul = document.querySelector("ul")
 const input = document.querySelector("input")
 const form = document.querySelector('form')
 
+async function load(){
+    const res = await fetch("http://localhost:3000").then((data) => data.json())
+    
+    
+    res.urls.map(({name, url}) => addElement({name, url}))
+}
+
+load()
+
+
 function addElement({ name, url }) {
     const li = document.createElement('li')
     const a = document.createElement("a")
     const trash = document.createElement("span")
-
+    
     a.href = url
     a.innerHTML = name
     a.target = "_blank"
@@ -17,11 +27,16 @@ function addElement({ name, url }) {
     li.append(a)
     li.append(trash)
     ul.append(li)
+
+
 }
 
 function removeElement(el) {
+    let { value } = input
+    const [name, url] = value.split(",")
     if (confirm('Tem certeza que deseja deletar?'))
         el.parentNode.remove()
+        fetch("http://localhost:3000/?name="+name+"&url="+url+"&del=1")
 }
 
 form.addEventListener("submit", (event) => {
@@ -41,6 +56,5 @@ form.addEventListener("submit", (event) => {
         return alert("Digite a url da maneira correta")
 
     addElement({ name, url })
-
-    input.value = ""
+    fetch("http://localhost:3000/?name="+name+"&url="+url)
 })
